@@ -1,0 +1,659 @@
+/* Hill Climb Racing - Complete UI & Arcade Styling */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0d1117;
+  font-family: 'Arial Black', Impact, 'Segoe UI Black', sans-serif;
+  color: #FFFFFF;
+}
+
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+/* Common UI Utilities */
+.hidden {
+  display: none !important;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* --- HUD (In-Game Heads-Up Display) --- */
+#gameHUD {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.hud-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+/* Coin Display Badge */
+.coin-badge {
+  background: linear-gradient(180deg, #374151 0%, #1F2937 100%);
+  border: 3px solid #F59E0B;
+  border-radius: 24px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 2px 2px rgba(255, 255, 255, 0.2);
+}
+
+.coin-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.6));
+}
+
+.coin-amount {
+  font-size: 20px;
+  color: #FCD34D;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Distance Badge */
+.distance-badge {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border: 3px solid #38BDF8;
+  border-radius: 16px;
+  padding: 6px 18px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.distance-value {
+  font-size: 28px;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+.distance-best {
+  font-size: 11px;
+  color: #94A3B8;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+}
+
+/* Top Buttons */
+.icon-btn {
+  background: linear-gradient(180deg, #4B5563 0%, #374151 100%);
+  border: 2px solid #9CA3AF;
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Dashboard Gauges (RPM, Speed, Fuel) */
+.hud-center-cluster {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Gauge Cluster */
+.gauge {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1E293B 40%, #0F172A 100%);
+  border: 3px solid #64748B;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.gauge-label {
+  font-size: 9px;
+  color: #94A3B8;
+  margin-top: 26px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.gauge-needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 26px;
+  background: #EF4444;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) rotate(-120deg);
+  border-radius: 2px;
+  transition: transform 0.05s ease-out;
+  box-shadow: 0 0 4px #EF4444;
+}
+
+.gauge-cap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Fuel Gauge */
+.fuel-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fuel-label-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #F87171;
+}
+
+.fuel-bar-container {
+  width: 110px;
+  height: 16px;
+  background: #1F2937;
+  border: 2px solid #4B5563;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.fuel-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #EF4444 0%, #F59E0B 40%, #10B981 100%);
+  transition: width 0.15s ease-out;
+}
+
+.low-fuel-blink {
+  animation: fuelBlink 0.6s infinite alternate;
+}
+
+@keyframes fuelBlink {
+  from { filter: drop-shadow(0 0 2px #EF4444); }
+  to { filter: drop-shadow(0 0 14px #EF4444); }
+}
+
+/* --- Touch / On-Screen Pedals --- */
+#controlsOverlay {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 36px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.pedal {
+  pointer-events: auto;
+  width: 100px;
+  height: 130px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.6), 0 15px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  user-select: none;
+}
+
+.pedal-brake {
+  background: linear-gradient(180deg, #EF4444 0%, #B91C1C 100%);
+  border: 4px solid #FCA5A5;
+}
+
+.pedal-gas {
+  background: linear-gradient(180deg, #10B981 0%, #047857 100%);
+  border: 4px solid #6EE7B7;
+}
+
+.pedal-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.pedal-key-hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: Arial, sans-serif;
+  margin-top: 4px;
+}
+
+.pedal:active, .pedal.active {
+  transform: translateY(8px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.6), 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* --- GARAGE SCREEN --- */
+#garageScreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.garage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.garage-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-logo {
+  font-size: 36px;
+  background: linear-gradient(180deg, #F59E0B 0%, #EF4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+  letter-spacing: 1px;
+}
+
+.section-label {
+  font-size: 14px;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+
+/* Vehicle Selector Cards */
+.vehicle-selector-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.vehicle-card {
+  flex: 0 0 170px;
+  background: linear-gradient(180deg, #334155 0%, #1E293B 100%);
+  border: 3px solid #475569;
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  border-color: #38BDF8;
+}
+
+.vehicle-card.selected {
+  border-color: #F59E0B;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+}
+
+.vehicle-card.locked {
+  opacity: 0.75;
+  filter: grayscale(0.4);
+}
+
+.vehicle-card-title {
+  font-size: 15px;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.vehicle-card-preview {
+  width: 100%;
+  height: 75px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vehicle-card-status {
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #FCD34D;
+}
+
+/* Upgrades Grid */
+.upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.upgrade-tile {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border: 2px solid #334155;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.upgrade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upgrade-icon {
+  font-size: 20px;
+}
+
+.upgrade-name {
+  font-size: 15px;
+  color: #FFFFFF;
+}
+
+.upgrade-lvl {
+  font-size: 13px;
+  color: #38BDF8;
+}
+
+.upgrade-bar {
+  width: 100%;
+  height: 10px;
+  background: #334155;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.upgrade-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #10B981 100%);
+  border-radius: 5px;
+  transition: width 0.25s ease;
+}
+
+.upgrade-btn {
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 0 #92400E;
+}
+
+.upgrade-btn.maxed {
+  background: #475569;
+  box-shadow: none;
+  cursor: default;
+}
+
+.upgrade-btn.disabled {
+  background: #64748B;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+/* Stage Selector Row */
+.stage-selector-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.stage-card {
+  flex: 0 0 180px;
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border: 3px solid #334155;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.stage-card:hover {
+  transform: translateY(-3px);
+}
+
+.stage-card.selected {
+  border-color: #10B981;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.stage-card.locked {
+  opacity: 0.6;
+}
+
+.stage-name {
+  font-size: 16px;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.stage-record {
+  font-size: 12px;
+  color: #94A3B8;
+  font-family: Arial, sans-serif;
+}
+
+/* Big Action Button (RACE!) */
+.garage-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.start-race-btn {
+  background: linear-gradient(180deg, #10B981 0%, #047857 100%);
+  border: 4px solid #6EE7B7;
+  color: #FFFFFF;
+  font-size: 28px;
+  padding: 14px 60px;
+  border-radius: 40px;
+  box-shadow: 0 8px 0 #064E3B, 0 12px 24px rgba(16, 185, 129, 0.5);
+  animation: pulseGlow 1.8s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { transform: scale(1); box-shadow: 0 8px 0 #064E3B, 0 12px 24px rgba(16, 185, 129, 0.4); }
+  to { transform: scale(1.04); box-shadow: 0 8px 0 #064E3B, 0 14px 34px rgba(16, 185, 129, 0.8); }
+}
+
+/* --- MODALS (Game Over & Pause) --- */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  border: 4px solid #475569;
+  border-radius: 24px;
+  padding: 32px 40px;
+  text-align: center;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 26px;
+  color: #EF4444;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.record-badge {
+  display: inline-block;
+  background: #F59E0B;
+  color: #1E293B;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  animation: bounce 0.8s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
+.stats-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #94A3B8;
+}
+
+.stat-highlight {
+  color: #FFFFFF;
+  font-size: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(180deg, #10B981 0%, #047857 100%);
+  border: 3px solid #6EE7B7;
+  color: #FFFFFF;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 14px;
+  box-shadow: 0 6px 0 #064E3B;
+}
+
+.btn-secondary {
+  flex: 1;
+  background: linear-gradient(180deg, #475569 0%, #334155 100%);
+  border: 3px solid #94A3B8;
+  color: #FFFFFF;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 14px;
+  box-shadow: 0 6px 0 #1E293B;
+}
+
+/* Keyboard hint helper text */
+.keyboard-hint {
+  margin-top: 14px;
+  font-size: 11px;
+  color: #64748B;
+  font-family: Arial, sans-serif;
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hill Climb Racing 2D</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Main Game Rendering Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- GARAGE & VEHICLE CUSTOMIZATION SCREEN -->
+  <div id="garageScreen">
+    <div class="garage-header">
+      <div class="garage-title-wrap">
+        <div class="game-logo">HILL CLIMB</div>
+      </div>
+      <div class="hud-group">
+        <div class="coin-badge">
+          <span class="coin-icon">🪙</span>
+          <span class="coin-amount" id="garageCoins">999,999,999</span>
+        </div>
+        <button class="icon-btn" id="garageSoundBtn" title="Toggle Sound">
+          <span class="sound-icon">🔊</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. Vehicle Selector -->
+    <div class="section-label">Select Vehicle</div>
+    <div class="vehicle-selector-row" id="garageVehicleList">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- 2. Upgrades Grid -->
+    <div class="section-label">Vehicle Upgrades</div>
+    <div class="upgrade-grid" id="garageUpgradeGrid">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- 3. Stage Selector -->
+    <div class="section-label">Stage Select</div>
+    <div class="stage-selector-row" id="garageStageList">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- 4. Start Race Button -->
+    <div class="garage-footer">
+      <button class="start-race-btn" id="startRaceBtn">START RACE 🏁</button>
+    </div>
+  </div>
+
+  <!-- HEADS UP DISPLAY (DURING PLAY) -->
+  <div id="gameHUD" class="hidden">
+    <div class="hud-top-bar">
+      <!-- Left: Coins & Stage -->
+      <div class="hud-group">
+        <div class="coin-badge">
+          <span class="coin-icon">🪙</span>
+          <span class="coin-amount" id="hudCoins">0</span>
+        </div>
+      </div>
+
+      <!-- Center: Distance & Record -->
+      <div class="distance-badge">
+        <div class="distance-value" id="hudDistance">0 m</div>
+        <div class="distance-best" id="hudBestRecord">Record: 0 m</div>
+      </div>
+
+      <!-- Right: Pause & Audio -->
+      <div class="hud-group">
+        <button class="icon-btn" id="soundToggleBtn" title="Toggle Sound">
+          <span class="sound-icon">🔊</span>
+        </button>
+        <button class="icon-btn" id="pauseBtn" title="Pause Game">⏸️</button>
+      </div>
+    </div>
+
+    <!-- Dashboard Instrument Cluster (Speedometer, RPM, Fuel) -->
+    <div class="hud-center-cluster">
+      <!-- Speedometer -->
+      <div class="gauge">
+        <div class="gauge-needle" id="speedNeedle"></div>
+        <div class="gauge-cap"></div>
+        <div class="gauge-label">SPEED</div>
+      </div>
+
+      <!-- Fuel Tank Meter -->
+      <div class="fuel-cluster" id="fuelGaugeContainer">
+        <div class="fuel-label-row">
+          <span>⛽ FUEL</span>
+        </div>
+        <div class="fuel-bar-container">
+          <div class="fuel-bar-fill" id="fuelBarInner"></div>
+        </div>
+      </div>
+
+      <!-- RPM Gauge -->
+      <div class="gauge">
+        <div class="gauge-needle" id="rpmNeedle"></div>
+        <div class="gauge-cap"></div>
+        <div class="gauge-label">RPM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ON-SCREEN / TOUCH PEDALS OVERLAY -->
+  <div id="controlsOverlay" class="hidden">
+    <!-- Brake / Tilt Back Pedal -->
+    <div class="pedal pedal-brake" id="brakePedal">
+      <div class="pedal-icon">🛑</div>
+      <div>BRAKE</div>
+      <div class="pedal-key-hint">[A / ◀ / S / ▼]</div>
+    </div>
+
+    <!-- Gas / Tilt Forward Pedal -->
+    <div class="pedal pedal-gas" id="gasPedal">
+      <div class="pedal-icon">⚡</div>
+      <div>GAS</div>
+      <div class="pedal-key-hint">[D / ▶ / W / ▲]</div>
+    </div>
+  </div>
+
+  <!-- PAUSE MODAL -->
+  <div id="pauseModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title" style="color: #38BDF8;">GAME PAUSED</div>
+      <div class="modal-actions" style="flex-direction: column;">
+        <button class="btn-primary" id="resumeBtn">RESUME</button>
+        <button class="btn-secondary" id="pauseRestartBtn">RESTART</button>
+        <button class="btn-secondary" id="pauseGarageBtn">GARAGE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="gameOverModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title" id="gameOverTitle">DRIVER DOWN!</div>
+      <div class="record-badge" id="newRecordBadge" style="display: none;">🏆 NEW RECORD!</div>
+
+      <div class="stats-card">
+        <div class="stat-row">
+          <span>Distance Traveled:</span>
+          <span class="stat-highlight" id="gameOverDistance">0 m</span>
+        </div>
+        <div class="stat-row">
+          <span>Coins Collected:</span>
+          <span class="stat-highlight" style="color: #FCD34D;" id="gameOverCoins">+0</span>
+        </div>
+        <div class="stat-row">
+          <span>Total Coins:</span>
+          <span class="stat-highlight" style="color: #FCD34D;" id="gameOverTotalCoins">0</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-primary" id="gameOverRetryBtn">RETRY</button>
+        <button class="btn-secondary" id="gameOverGarageBtn">GARAGE</button>
+      </div>
+      <div class="keyboard-hint">Press SPACE to Retry</div>
+    </div>
+  </div>
+
+  <!-- GAME SCRIPTS -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/terrain.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
